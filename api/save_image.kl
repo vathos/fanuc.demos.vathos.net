@@ -1,0 +1,7 @@
+PROGRAM save_image
+VAR
+  status: INTEGER
+  file_var: FILE
+  response: STRING[128]
+BEGIN
+END save_image

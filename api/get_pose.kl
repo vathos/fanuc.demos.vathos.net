@@ -1,0 +1,7 @@
+PROGRAM get_pose
+VAR
+  status: INTEGER
+  file_var: FILE
+  response: STRING[128]
+BEGIN
+END get_pose

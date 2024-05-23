@@ -1,0 +1,7 @@
+PROGRAM handeye_calibration
+VAR
+  status: INTEGER
+  file_var: FILE
+  response: STRING[128]
+BEGIN
+END handeye_calibration
