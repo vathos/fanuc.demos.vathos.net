@@ -52,7 +52,7 @@ BEGIN
   GET_TPE_STR(2, workflow)
   GET_TPE_INT(3, async)
   CNV_INT_STR(async, 1, 0, asyncStr)
-  asyncStr = SUB_STR(secondsS, 2, 1)
+  asyncStr = SUB_STR(asyncStr, 2, 1)
 
   SET_FILE_ATR(fid, ATR_IA)
   -- clear and re-establish connection
@@ -83,7 +83,7 @@ BEGIN
   ENDIF
   
   -- check for first character - to indicate an error and return
-  CNV_STR_INT(SUB_STR(response, 1, 1), return_type)
+  -- CNV_STR_INT(SUB_STR(response, 1, 1), return_type)
   -- FIXME: what to do for -1?
   
 
