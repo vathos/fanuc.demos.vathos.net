@@ -1,7 +1,94 @@
 PROGRAM trigger
+CONST
+    TPE_TYP_INT  = 1
+    TPE_TYP_REAL = 2
+    TPE_TYP_STR  = 3
 VAR
-  status: INTEGER
-  file_var: FILE
-  response: STRING[128]
+  connection  : STRING[16]
+  workflow    : STRING[16]
+  async       : INTEGER
+  asyncStr    : STRING[4]
+  status      : INTEGER
+  fid         : FILE
+  response    : STRING[128]
+
+ROUTINE GET_TPE_PRM2(paramNo : INTEGER; expType : INTEGER; intVal : INTEGER; realVal : REAL; strVal : STRING)
+VAR
+    dataType  : INTEGER
+    status    : INTEGER
 BEGIN
+    GET_TPE_PRM(paramNo, dataType, intVal, realVal, strVal, status)
+    IF status<>0 THEN
+        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        ABORT
+    ENDIF
+
+    IF dataType<>expType THEN
+        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        ABORT
+    ENDIF
+END GET_TPE_PRM2
+
+ROUTINE GET_TPE_INT(paramNo : INTEGER; intVal : INTEGER)
+VAR
+    realVal : REAL
+    strVal  : STRING[1]
+BEGIN
+    GET_TPE_PRM2(paramNo, TPE_TYP_INT, intVal, realVal, strVal)
+END GET_TPE_INT
+
+ROUTINE GET_TPE_STR(paramNo : INTEGER; strVal : STRING)
+VAR
+    intVal  : INTEGER
+    realVal : REAL
+BEGIN
+    GET_TPE_PRM2(paramNo, TPE_TYP_STR, intVal, realVal, strVal)
+END GET_TPE_STR
+
+
+BEGIN
+  -- parse arguments
+  GET_TPE_STR(1, connection)
+  GET_TPE_STR(2, workflow)
+  GET_TPE_INT(3, async)
+  CNV_INT_STR(async, 1, 0, asyncStr)
+  asyncStr = SUB_STR(secondsS, 2, 1)
+
+  SET_FILE_ATR(fid, ATR_IA)
+  -- clear and re-establish connection
+  MSG_DISCO('C1:', status)
+  MSG_CONNECT('C1:', status)
+  IF status<>0 THEN
+    WRITE TPERROR('[trigger] could not establish connection', connection, CR)
+    ABORT
+  ENDIF
+
+  -- open file handle and write message
+  OPEN FILE fid('rw','C1:')
+  WRITE fid('trigger;', workflow, ',', asyncStr)
+  status = IO_STATUS(fid)
+
+  -- read response
+  response = ''
+  READ fid(response)
+  status = IO_STATUS(fid)
+  IF status<>0 THEN
+    WRITE TPERROR('[trigger] failed to read response', CR)
+    ABORT
+  ENDIF
+
+  -- could be uninitialized on parsing errors
+  IF UNINIT(response) THEN
+    response = '-1'
+  ENDIF
+  
+  -- check for first character - to indicate an error and return
+  CNV_STR_INT(SUB_STR(response, 1, 1), return_type)
+  -- FIXME: what to do for -1?
+  
+
+  CLOSE FILE fid
+  MSG_DISCO('C1:', status)
+  
+  
 END trigger
