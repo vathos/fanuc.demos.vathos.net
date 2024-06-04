@@ -2,9 +2,15 @@ PROGRAM save_image
 VAR
   connection      : STRING[16]
   status          : INTEGER
-  file_var        : FILE
+  fid             : FILE
   response        : STRING[128]
   current_pose    : XYZWPREXT
+  current_pose_x  : STRING[16]
+  current_pose_y  : STRING[16]
+  current_pose_z  : STRING[16]
+  current_pose_r  : STRING[16]
+  current_pose_p  : STRING[16]
+  current_pose_w  : STRING[16]
 %INCLUDE utils.h
 BEGIN
   GET_TPE_STR(1, connection)
@@ -19,11 +25,19 @@ BEGIN
 
   -- get current pose
   current_pose = CURPOS(0, 0)
+  CNV_REAL_STR(0.001*current_pose.x, 16, 6, current_pose_x)
+  CNV_REAL_STR(0.001*current_pose.y, 16, 6, current_pose_y)
+  CNV_REAL_STR(0.001*current_pose.z, 16, 6, current_pose_z)
+  CNV_REAL_STR(current_pose.r, 16, 3, current_pose_r)
+  CNV_REAL_STR(current_pose.p, 16, 3, current_pose_p)
+  CNV_REAL_STR(current_pose.w, 16, 3, current_pose_w)
 
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  WRITE fid('save_image;depth;1;' + current_pose.x::9::2 + ',' + current_pose.y::9::2 + ',' + current_pose.z::9::2 + ',' + current_pose.w::9::2 + ',' + current_pose.p::9::2 + ',' + current_pose.r::9::2 + ';xyz;1', CR)
+  -- WRITE fid('save_image;depth;1;' + current_pose.x::9::2 + ',' + current_pose.y::9::2 + ',' + current_pose.z::9::2 + ',' + current_pose.w::9::2 + ',' + current_pose.p::9::2 + ',' + current_pose.r::9::2 + ';xyz;1', CR)
+  WRITE fid('save_image;depth;1;' + current_pose_x + ',' + current_pose_y + ',' + current_pose_z + ',' + current_pose_r + ',' + current_pose_p + ',' + current_pose_w + ';xyz;1', CR)
+  
   status = IO_STATUS(fid)
   IF status<>0 THEN
     WRITE TPERROR('[save_image] Could not open socket for writing with status', status, CR)
