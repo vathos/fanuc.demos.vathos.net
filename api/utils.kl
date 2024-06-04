@@ -5,38 +5,64 @@ CONST
     TPE_TYP_REAL = 2
     TPE_TYP_STR  = 3
 
-ROUTINE GET_TPE_PRM2(paramNo : INTEGER; expType : INTEGER; intVal : INTEGER; realVal : REAL; strVal : STRING)
+ROUTINE parse_args(paramNo : INTEGER; expType : INTEGER; intVal : INTEGER; realVal : REAL; strVal : STRING)
 VAR
     dataType  : INTEGER
     status    : INTEGER
 BEGIN
     GET_TPE_PRM(paramNo, dataType, intVal, realVal, strVal, status)
     IF status<>0 THEN
-        WRITE TPERROR('[get_tpe_prm2] could not get parameter', paramNo, CR)
+        WRITE TPERROR('[parse_args] could not get parameter', paramNo, CR)
         ABORT
     ENDIF
 
     IF dataType<>expType THEN
-        WRITE TPERROR('[get_tpe_prm2] could not get parameter', paramNo, CR)
+        WRITE TPERROR('[parse_args] could not get parameter', paramNo, CR)
         ABORT
     ENDIF
-END GET_TPE_PRM2
+END parse_args
 
-ROUTINE GET_TPE_INT(paramNo : INTEGER; intVal : INTEGER)
+ROUTINE parse_int_arg(paramNo : INTEGER; intVal : INTEGER)
 VAR
     realVal : REAL
     strVal  : STRING[1]
 BEGIN
-    GET_TPE_PRM2(paramNo, TPE_TYP_INT, intVal, realVal, strVal)
-END GET_TPE_INT
+    parse_args(paramNo, TPE_TYP_INT, intVal, realVal, strVal)
+END parse_int_arg
 
-ROUTINE GET_TPE_STR(paramNo : INTEGER; strVal : STRING)
+ROUTINE parse_str_arg(paramNo : INTEGER; strVal : STRING)
 VAR
     intVal  : INTEGER
     realVal : REAL
 BEGIN
-    GET_TPE_PRM2(paramNo, TPE_TYP_STR, intVal, realVal, strVal)
-END GET_TPE_STR
+    parse_args(paramNo, TPE_TYP_STR, intVal, realVal, strVal)
+END parse_str_arg
+
+ROUTINE split_str(str:STRING; sep:STRING; out:ARRAY[*] OF STRING)
+  VAR
+    i   : INTEGER
+    k   : INTEGER
+	start    : INTEGER
+  BEGIN
+    k = 1
+
+    -- initialize the whole out array to ''
+    FOR i = 1 TO array_len(out) DO
+      out[i] = ''
+    ENDFOR
+
+	start = 1
+
+    FOR i = 1 TO (STR_LEN(str)-STR_LEN(sep)) DO
+		IF (SUB_STR(str, i, STR_LEN(sep))=sep) THEN
+			out[k] = SUB_STR(str, start, (i-start))
+			k = k + 1
+			start = i+STR_LEN(sep)
+		ENDIF
+    ENDFOR
+
+	out[k] = SUB_STR(str, start, (STR_LEN(str)-start+1))
+  END split_str
 
 BEGIN
 END utils

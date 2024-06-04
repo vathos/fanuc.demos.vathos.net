@@ -13,7 +13,7 @@ VAR
   current_pose_w  : STRING[16]
 %INCLUDE utils.h
 BEGIN
-  GET_TPE_STR(1, connection)
+  parse_str_arg(1, connection)
 
   -- clear and re-establish connection
   MSG_DISCO(connection, status)

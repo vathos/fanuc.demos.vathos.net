@@ -12,9 +12,9 @@ VAR
 BEGIN
 
   -- parse arguments
-  GET_TPE_STR(1, connection)
-  GET_TPE_STR(2, workflow)
-  GET_TPE_INT(3, async)
+  parse_str_arg(1, connection)
+  parse_str_arg(2, workflow)
+  parse_int_arg(3, async)
   CNV_INT_STR(async, 1, 0, async_str)
   async_str = SUB_STR(async_str, 2, 1)
 

@@ -10,11 +10,11 @@ VAR
   response        : STRING[128]
 %INCLUDE utils.h
 BEGIN
-  GET_TPE_STR(1, connection)
-  GET_TPE_STR(2, product_id)
-  GET_TPE_STR(3, service)
-  GET_TPE_STR(4, key)
-  GET_TPE_STR(5, value)
+  parse_str_arg(1, connection)
+  parse_str_arg(2, product_id)
+  parse_str_arg(3, service)
+  parse_str_arg(4, key)
+  parse_str_arg(5, value)
   
   -- clear and re-establish connection
   MSG_DISCO(connection, status)

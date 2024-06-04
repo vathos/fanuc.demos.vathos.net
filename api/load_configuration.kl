@@ -8,9 +8,9 @@ VAR
   response        : STRING[128]
 %INCLUDE utils.h
 BEGIN
-  GET_TPE_STR(1, connection)
-  GET_TPE_STR(2, product_id)
-  GET_TPE_STR(3, workflow)
+  parse_str_arg(1, connection)
+  parse_str_arg(2, product_id)
+  parse_str_arg(3, workflow)
   
   -- clear and re-establish connection
   MSG_DISCO(connection, status)

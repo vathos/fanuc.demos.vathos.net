@@ -1,3 +1,3 @@
-ROUTINE GET_TPE_PRM2(paramNo:INTEGER; expType:INTEGER; intVal:INTEGER; realVal:REAL; strVal:STRING) FROM utils
-ROUTINE GET_TPE_INT(paramNo:INTEGER; intVal:INTEGER) FROM utils
-ROUTINE GET_TPE_STR(paramNo:INTEGER; strVal:STRING) FROM utils
+ROUTINE parse_args(paramNo:INTEGER; expType:INTEGER; intVal:INTEGER; realVal:REAL; strVal:STRING) FROM utils
+ROUTINE parse_int_arg(paramNo:INTEGER; intVal:INTEGER) FROM utils
+ROUTINE parse_str_arg(paramNo:INTEGER; strVal:STRING) FROM utils

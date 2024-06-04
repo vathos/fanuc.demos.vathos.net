@@ -10,10 +10,10 @@ VAR
   timeout_str     : STRING[8]
 %INCLUDE utils.h
 BEGIN
-  GET_TPE_STR(1, connection)
-  GET_TPE_STR(2, workflow)
-  GET_TPE_INT(3, timeout)
-  GET_TPE_INT(4, pr_index)
+  parse_str_arg(1, connection)
+  parse_str_arg(2, workflow)
+  parse_int_arg(3, timeout)
+  parse_int_arg(4, pr_index)
   -- cast timeout to string 
   CNV_INT_STR(timeout, 8, 0, timeout_str)
   
