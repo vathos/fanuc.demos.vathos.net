@@ -12,12 +12,12 @@ VAR
 BEGIN
     GET_TPE_PRM(paramNo, dataType, intVal, realVal, strVal, status)
     IF status<>0 THEN
-        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        WRITE TPERROR('[get_tpe_prm2] could not get parameter', paramNo, CR)
         ABORT
     ENDIF
 
     IF dataType<>expType THEN
-        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        WRITE TPERROR('[get_tpe_prm2] could not get parameter', paramNo, CR)
         ABORT
     ENDIF
 END GET_TPE_PRM2

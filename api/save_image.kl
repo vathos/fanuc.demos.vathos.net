@@ -35,7 +35,6 @@ BEGIN
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  -- WRITE fid('save_image;depth;1;' + current_pose.x::9::2 + ',' + current_pose.y::9::2 + ',' + current_pose.z::9::2 + ',' + current_pose.w::9::2 + ',' + current_pose.p::9::2 + ',' + current_pose.r::9::2 + ';xyz;1', CR)
   WRITE fid('save_image;depth;1;' + current_pose_x + ',' + current_pose_y + ',' + current_pose_z + ',' + current_pose_r + ',' + current_pose_p + ',' + current_pose_w + ';xyz;1', CR)
   
   status = IO_STATUS(fid)

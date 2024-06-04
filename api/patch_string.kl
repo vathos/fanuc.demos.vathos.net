@@ -1,35 +1,38 @@
-PROGRAM get_pose
+PROGRAM patch_string
 VAR
   connection      : STRING[16]
+  product_id      : STRING[32]
+  service         : STRING[32]
+  key             : STRING[32]
+  value           : STRING[32]
   status          : INTEGER
   fid             : FILE
   response        : STRING[128]
-  workflow        : STRING[32]
-  pr_index        : INTEGER
-  timeout         : INTEGER
-  timeout_str     : STRING[8]
 %INCLUDE utils.h
 BEGIN
   GET_TPE_STR(1, connection)
-  
-  CNV_INT_STR(async, 1, 0, async_str)
+  GET_TPE_STR(2, product_id)
+  GET_TPE_STR(3, service)
+  GET_TPE_STR(4, key)
+  GET_TPE_STR(5, value)
   
   -- clear and re-establish connection
   MSG_DISCO(connection, status)
   MSG_CONNECT(connection, status)
   IF status<>0 THEN
-    WRITE TPERROR('[get_pose] Connection failed with status ', status, CR)
+    WRITE TPERROR('[patch_string] Connection failed with status ', status, CR)
     ABORT
   ENDIF
 
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  WRITE fid('get_pose;' + workflow + ';xyz;1;' + timeout, CR)
+  -- FIXME: upgrade this to a product/service pair
+  WRITE fid('patch_configuration;' + product_id + ';' + key + ';0,' + value, CR)
   
   status = IO_STATUS(fid)
   IF status<>0 THEN
-    WRITE TPERROR('[get_pose] Could not open socket for writing with status', status, CR)
+    WRITE TPERROR('[patch_string] Could not open socket for writing with status', status, CR)
     MSG_DISCO(connection, status)
     ABORT
   ENDIF
@@ -41,17 +44,15 @@ BEGIN
   IF status<>0 THEN
     CLOSE FILE fid
     MSG_DISCO(connection, status)
-    WRITE TPERROR('[get_pose] Read response failed with status', status, CR)
+    WRITE TPERROR('[patch_string] Read response failed with status', status, CR)
     ABORT
   ENDIF
 
   -- check for server-side errors
   IF SUB_STR(response, 1, 1)='-' THEN
-    WRITE TPERROR('[get_pose] Server error', CR)
+    WRITE TPERROR('[patch_string] Server error', CR)
   ENDIF
   
-  
-
   CLOSE FILE fid
   MSG_DISCO(connection, status)  
-END save_image
+END patch_string

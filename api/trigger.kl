@@ -4,7 +4,7 @@ VAR
   connection  : STRING[16]
   workflow    : STRING[16]
   async       : INTEGER
-  asyncStr    : STRING[4]
+  async_str   : STRING[4]
   status      : INTEGER
   fid         : FILE
   response    : STRING[128]
@@ -15,8 +15,8 @@ BEGIN
   GET_TPE_STR(1, connection)
   GET_TPE_STR(2, workflow)
   GET_TPE_INT(3, async)
-  CNV_INT_STR(async, 1, 0, asyncStr)
-  asyncStr = SUB_STR(asyncStr, 2, 1)
+  CNV_INT_STR(async, 1, 0, async_str)
+  async_str = SUB_STR(async_str, 2, 1)
 
   -- clear and re-establish connection
   MSG_DISCO(connection, status)
