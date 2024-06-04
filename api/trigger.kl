@@ -17,9 +17,7 @@ BEGIN
   GET_TPE_INT(3, async)
   CNV_INT_STR(async, 1, 0, asyncStr)
   asyncStr = SUB_STR(asyncStr, 2, 1)
-  WRITE('Arg ', connection)
 
-  SET_FILE_ATR(fid, ATR_IA)
   -- clear and re-establish connection
   MSG_DISCO(connection, status)
   MSG_CONNECT(connection, status)
@@ -29,6 +27,7 @@ BEGIN
   ENDIF
 
   -- open file handle and write message
+  SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
   WRITE fid('trigger;' + workflow + ';' + asyncStr, CR)
   status = IO_STATUS(fid)

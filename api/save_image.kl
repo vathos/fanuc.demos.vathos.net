@@ -1,7 +1,52 @@
 PROGRAM save_image
 VAR
-  status: INTEGER
-  file_var: FILE
-  response: STRING[128]
+  connection      : STRING[16]
+  status          : INTEGER
+  file_var        : FILE
+  response        : STRING[128]
+  current_pose    : XYZWPREXT
+%INCLUDE utils.h
 BEGIN
+  GET_TPE_STR(1, connection)
+
+  -- clear and re-establish connection
+  MSG_DISCO(connection, status)
+  MSG_CONNECT(connection, status)
+  IF status<>0 THEN
+    WRITE TPERROR('[save_image] Connection failed with status ', status, CR)
+    ABORT
+  ENDIF
+
+  -- get current pose
+  current_pose = CURPOS(0, 0)
+
+  -- open file handle and write message
+  SET_FILE_ATR(fid, ATR_IA)
+  OPEN FILE fid('rw', connection)
+  WRITE fid('save_image;depth;1;' + current_pose.x::9::2 + ',' + current_pose.y::9::2 + ',' + current_pose.z::9::2 + ',' + current_pose.w::9::2 + ',' + current_pose.p::9::2 + ',' + current_pose.r::9::2 + ';xyz;1', CR)
+  status = IO_STATUS(fid)
+  IF status<>0 THEN
+    WRITE TPERROR('[save_image] Could not open socket for writing with status', status, CR)
+    MSG_DISCO(connection, status)
+    ABORT
+  ENDIF
+
+  -- read response
+  response = ''
+  READ fid(response)
+  status = IO_STATUS(fid)
+  IF status<>0 THEN
+    CLOSE FILE fid
+    MSG_DISCO(connection, status)
+    WRITE TPERROR('[save_image] Read response failed with status', status, CR)
+    ABORT
+  ENDIF
+
+  -- check for server-side errors
+  IF SUB_STR(response, 1, 1)='-' THEN
+    WRITE TPERROR('[save_image] Server error', CR)
+  ENDIF
+  
+  CLOSE FILE fid
+  MSG_DISCO(connection, status)  
 END save_image
