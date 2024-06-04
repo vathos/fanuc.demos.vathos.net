@@ -50,4 +50,4 @@ BEGIN
   
   CLOSE FILE fid
   MSG_DISCO(connection, status)  
-END patch_string
+END load_configuration

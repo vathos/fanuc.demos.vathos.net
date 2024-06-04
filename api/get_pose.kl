@@ -11,8 +11,11 @@ VAR
 %INCLUDE utils.h
 BEGIN
   GET_TPE_STR(1, connection)
-  
-  CNV_INT_STR(async, 1, 0, async_str)
+  GET_TPE_STR(2, workflow)
+  GET_TPE_INT(3, timeout)
+  GET_TPE_INT(4, pr_index)
+  -- cast timeout to string 
+  CNV_INT_STR(timeout, 8, 0, timeout_str)
   
   -- clear and re-establish connection
   MSG_DISCO(connection, status)
@@ -25,7 +28,7 @@ BEGIN
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  WRITE fid('get_pose;' + workflow + ';xyz;1;' + timeout, CR)
+  WRITE fid('get_pose;' + workflow + ';xyz;1;' + timeout_str, CR)
   
   status = IO_STATUS(fid)
   IF status<>0 THEN
@@ -54,4 +57,4 @@ BEGIN
 
   CLOSE FILE fid
   MSG_DISCO(connection, status)  
-END save_image
+END get_pose
