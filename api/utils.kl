@@ -1,0 +1,42 @@
+PROGRAM utils
+%NOLOCKGROUP
+CONST
+    TPE_TYP_INT  = 1
+    TPE_TYP_REAL = 2
+    TPE_TYP_STR  = 3
+
+ROUTINE GET_TPE_PRM2(paramNo : INTEGER; expType : INTEGER; intVal : INTEGER; realVal : REAL; strVal : STRING)
+VAR
+    dataType  : INTEGER
+    status    : INTEGER
+BEGIN
+    GET_TPE_PRM(paramNo, dataType, intVal, realVal, strVal, status)
+    IF status<>0 THEN
+        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        ABORT
+    ENDIF
+
+    IF dataType<>expType THEN
+        WRITE TPERROR('[trigger] could not get parameter', paramNo, CR)
+        ABORT
+    ENDIF
+END GET_TPE_PRM2
+
+ROUTINE GET_TPE_INT(paramNo : INTEGER; intVal : INTEGER)
+VAR
+    realVal : REAL
+    strVal  : STRING[1]
+BEGIN
+    GET_TPE_PRM2(paramNo, TPE_TYP_INT, intVal, realVal, strVal)
+END GET_TPE_INT
+
+ROUTINE GET_TPE_STR(paramNo : INTEGER; strVal : STRING)
+VAR
+    intVal  : INTEGER
+    realVal : REAL
+BEGIN
+    GET_TPE_PRM2(paramNo, TPE_TYP_STR, intVal, realVal, strVal)
+END GET_TPE_STR
+
+BEGIN
+END utils
