@@ -29,7 +29,7 @@ BEGIN
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  WRITE fid('trigger;' + workflow + ';' + asyncStr, CR)
+  WRITE fid('trigger;' + workflow + ';' + async_str, CR)
   status = IO_STATUS(fid)
   IF status<>0 THEN
     WRITE TPERROR('[trigger] Could not open socket for writing with status', status, CR)
