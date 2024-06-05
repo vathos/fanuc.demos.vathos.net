@@ -27,9 +27,7 @@ BEGIN
   -- open file handle and write message
   SET_FILE_ATR(fid, ATR_IA)
   OPEN FILE fid('rw', connection)
-  -- FIXME: upgrade this to a product/service pair
-  WRITE fid('patch_configuration;' + product_id + ';' + key + ';0,' + value, CR)
-  
+  WRITE fid('patch_configuration;' + product_id + ';' + service + ';' + key + ';0,' + value, CR)
   status = IO_STATUS(fid)
   IF status<>0 THEN
     WRITE TPERROR('[patch_string] Could not open socket for writing with status', status, CR)

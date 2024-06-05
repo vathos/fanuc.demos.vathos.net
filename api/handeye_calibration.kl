@@ -1,7 +1,52 @@
 PROGRAM handeye_calibration
 VAR
-  status: INTEGER
-  file_var: FILE
-  response: STRING[128]
+  connection      : STRING[16]
+  product_id      : STRING[32]
+  session         : STRING[32]
+  status          : INTEGER
+  fid             : FILE
+  response        : STRING[128]
+%INCLUDE utils.h
 BEGIN
+  parse_str_arg(1, connection)
+  parse_str_arg(2, product_id)
+  parse_str_arg(3, session)
+  
+  -- clear and re-establish connection
+  MSG_DISCO(connection, status)
+  MSG_CONNECT(connection, status)
+  IF status<>0 THEN
+    WRITE TPERROR('[handeye_calibration] Connection failed with status ', status, CR)
+    ABORT
+  ENDIF
+
+  -- open file handle and write message
+  SET_FILE_ATR(fid, ATR_IA)
+  OPEN FILE fid('rw', connection)  
+  WRITE fid('handeye_calibration;' + product_id + ';' + session + ';xyz;1;0;0.025;10;7;2d.handeye.calibration.vathos.net', CR)
+  status = IO_STATUS(fid)
+  IF status<>0 THEN
+    WRITE TPERROR('[handeye_calibration] Could not open socket for writing with status', status, CR)
+    MSG_DISCO(connection, status)
+    ABORT
+  ENDIF
+
+  -- read response
+  response = ''
+  READ fid(response)
+  status = IO_STATUS(fid)
+  IF status<>0 THEN
+    CLOSE FILE fid
+    MSG_DISCO(connection, status)
+    WRITE TPERROR('[handeye_calibration] Read response failed with status', status, CR)
+    ABORT
+  ENDIF
+
+  -- check for server-side errors
+  IF SUB_STR(response, 1, 1)='-' THEN
+    WRITE TPERROR('[handeye_calibration] Server error', CR)
+  ENDIF
+  
+  CLOSE FILE fid
+  MSG_DISCO(connection, status)  
 END handeye_calibration

@@ -4,16 +4,28 @@ VAR
   status          : INTEGER
   fid             : FILE
   response        : STRING[128]
+  parsed_pose     : ARRAY[14] OF STRING[16]
+  result          : XYZWPR
   workflow        : STRING[32]
   pr_index        : INTEGER
+  r_index_class   : INTEGER
+  class           : REAL
+  product         : REAL
+  r_index_product : INTEGER
   timeout         : INTEGER
   timeout_str     : STRING[8]
+  
 %INCLUDE utils.h
 BEGIN
   parse_str_arg(1, connection)
   parse_str_arg(2, workflow)
   parse_int_arg(3, timeout)
   parse_int_arg(4, pr_index)
+  parse_int_arg(5, r_index_class)
+  parse_int_arg(6, r_index_product)
+  class = -1
+  product = -1
+
   -- cast timeout to string 
   CNV_INT_STR(timeout, 8, 0, timeout_str)
   
@@ -50,10 +62,40 @@ BEGIN
 
   -- check for server-side errors
   IF SUB_STR(response, 1, 1)='-' THEN
+    CLOSE FILE fid
+    MSG_DISCO(connection, status)
     WRITE TPERROR('[get_pose] Server error', CR)
   ENDIF
+
+  -- split the second half of the reponse (type;)
+  split_str(SUB_STR(response, 3, 128), ',', parsed_pose)
   
-  
+  -- cast and write to the specified pos register
+  CNV_STR_REAL(parsed_pose[1], result.X)
+  result.X = result.X * 1000 
+  CNV_STR_REAL(parsed_pose[2], result.Y)
+  result.Y = result.Y * 1000 
+  CNV_STR_REAL(parsed_pose[3], result.Z)
+  result.Z = result.Z * 1000 
+  CNV_STR_REAL(parsed_pose[4], result.W)
+  CNV_STR_REAL(parsed_pose[5], result.P)
+  CNV_STR_REAL(parsed_pose[6], result.R)
+  SET_POS_REG(pr_index, result, status)
+  IF status<>0 THEN
+    CLOSE FILE fid
+    MSG_DISCO(connection, status)
+    WRITE TPERROR('[get_pose] Failed to set position register with status ', status, CR)
+    ABORT
+  ENDIF
+
+  -- set class and product
+  CNV_STR_REAL(parsed_pose[7], class)
+  SET_REAL_REG(r_index_class, class, status)
+  CNV_STR_REAL(parsed_pose[8], product)
+  SET_REAL_REG(r_index_product, product, status)
+  IF status<>0 THEN
+    WRITE TPERROR('[get_pose] Failed to set real registers with status ', status, CR)
+  ENDIF
 
   CLOSE FILE fid
   MSG_DISCO(connection, status)  

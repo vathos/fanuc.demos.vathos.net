@@ -5,37 +5,37 @@ CONST
     TPE_TYP_REAL = 2
     TPE_TYP_STR  = 3
 
-ROUTINE parse_args(paramNo : INTEGER; expType : INTEGER; intVal : INTEGER; realVal : REAL; strVal : STRING)
+ROUTINE parse_args(param_no : INTEGER; exp_type : INTEGER; int_val : INTEGER; real_val : REAL; str_val : STRING)
 VAR
     dataType  : INTEGER
     status    : INTEGER
 BEGIN
-    GET_TPE_PRM(paramNo, dataType, intVal, realVal, strVal, status)
+    GET_TPE_PRM(param_no, dataType, int_val, real_val, str_val, status)
     IF status<>0 THEN
-        WRITE TPERROR('[parse_args] could not get parameter', paramNo, CR)
+        WRITE TPERROR('[parse_args] could not get parameter', param_no, CR)
         ABORT
     ENDIF
 
-    IF dataType<>expType THEN
-        WRITE TPERROR('[parse_args] could not get parameter', paramNo, CR)
+    IF dataType<>exp_type THEN
+        WRITE TPERROR('[parse_args] could not get parameter', param_no, CR)
         ABORT
     ENDIF
 END parse_args
 
-ROUTINE parse_int_arg(paramNo : INTEGER; intVal : INTEGER)
+ROUTINE parse_int_arg(param_no : INTEGER; int_val : INTEGER)
 VAR
-    realVal : REAL
-    strVal  : STRING[1]
+    real_val : REAL
+    str_val  : STRING[1]
 BEGIN
-    parse_args(paramNo, TPE_TYP_INT, intVal, realVal, strVal)
+    parse_args(param_no, TPE_TYP_INT, int_val, real_val, str_val)
 END parse_int_arg
 
-ROUTINE parse_str_arg(paramNo : INTEGER; strVal : STRING)
+ROUTINE parse_str_arg(param_no : INTEGER; str_val : STRING)
 VAR
-    intVal  : INTEGER
-    realVal : REAL
+    int_val  : INTEGER
+    real_val : REAL
 BEGIN
-    parse_args(paramNo, TPE_TYP_STR, intVal, realVal, strVal)
+    parse_args(param_no, TPE_TYP_STR, int_val, real_val, str_val)
 END parse_str_arg
 
 ROUTINE split_str(str:STRING; sep:STRING; out:ARRAY[*] OF STRING)
